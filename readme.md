@@ -173,20 +173,6 @@ It needs `broker_name`, `standard_order_fee`, and `sentiment_score` columns, and
 
 `streamlit` and `plotly` for the frontend, `requests` + `beautifulsoup4` + `pdfplumber` for ingestion, `transformers` (FinBERT) + `praw` + `feedparser` for sentiment, `pandas` and `numpy` for the analytics.
 
-## Known gaps
-
-Worth knowing before you build on this:
-
-* `Dashboard.py` runs on hardcoded sample data — nothing connects it to `run_ingestion_pipeline()` or `aggregate_sentiment()` yet.
-* `requirement.txt` lists `reflex`, but no Reflex frontend exists in the repo.
-* `setup.py` still declares `name="portfolio_optimization"`, left over from another project.
-* Reddit credentials are passed as literals rather than read from the environment.
-* There are no tests, and scraping selectors break whenever a target site changes its markup.
-
-## Scraping note
-
-The ingestion module fetches public pages and published fee documents. Check each site's terms of service and `robots.txt` before pointing it at a real target, and keep request volume low.
-
 ## License
 
 MIT — see [LICENSE](LICENSE).

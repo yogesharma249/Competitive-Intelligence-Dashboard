@@ -1,8 +1,12 @@
 # Competitive Intelligence Dashboard & Strategy Engine
 
+Benchmarks German retail brokers by combining regulatory fee data with FinBERT news and social sentiment into a single Competitive Vulnerability Score.
+
 A prototype toolkit for benchmarking retail brokers against each other. It pulls competitor fee data from web pages and regulatory PDFs, scores public sentiment about each broker with a finance-tuned language model, and combines the two into a single **Competitive Vulnerability Score (CVS)** that maps onto a recommended tactic. Results are explored in a Streamlit dashboard.
 
 The project targets the German retail brokerage market: the PDF parser looks for fee terms from a *Preis- und Leistungsverzeichnis* (PLV), and the Reddit scraper reads r/Finanzen and r/investing.
+
+![Streamlit dashboard showing the price/sentiment quadrant chart and tactics table](docs/dashboard.png)
 
 ---
 
@@ -57,7 +61,7 @@ Because the scores are relative to the input set, adding or removing a broker ch
 
 Requires Python 3.9+.
 
-```bash
+```
 git clone https://github.com/yogesharma249/Competitive-Intelligence-Dashboard.git
 cd Competitive-Intelligence-Dashboard
 
@@ -71,7 +75,7 @@ The dependency file is named `requirement.txt` (singular). Installing it pulls i
 
 Run the dashboard:
 
-```bash
+```
 streamlit run Dashboard.py
 ```
 
@@ -83,7 +87,7 @@ It opens on <http://localhost:8501> with the built-in sample brokers.
 
 ### Fee ingestion
 
-```bash
+```
 python Unified_Ingestion.py
 ```
 
@@ -104,8 +108,8 @@ BROKER_CONFIG = {
 }
 ```
 
-* `type: "html"` fetches the page and pulls each fee with a CSS selector via BeautifulSoup.
-* `type: "pdf"` downloads the document, scans tables on the first five pages with `pdfplumber`, and takes the first number from any row matching one of the German fee keywords.
+- `type: "html"` fetches the page and pulls each fee with a CSS selector via BeautifulSoup.
+- `type: "pdf"` downloads the document, scans tables on the first five pages with `pdfplumber`, and takes the first number from any row matching one of the German fee keywords.
 
 Both routes run their result through `clean_fee_string`, which treats "free"/"kostenlos"/"gratis" as `0.0` and converts German decimal commas. Call `run_ingestion_pipeline()` to get the DataFrame directly instead of printing it.
 
@@ -113,7 +117,7 @@ The two entries shipped in `BROKER_CONFIG` are illustrative. The Trade Republic 
 
 ### Sentiment
 
-```bash
+```
 python sentimental_analysis.py
 ```
 
@@ -157,9 +161,27 @@ It needs `broker_name`, `standard_order_fee`, and `sentiment_score` columns, and
 
 ---
 
+## Known gaps
+
+What this prototype does not yet do, and what to be careful about when reading its output.
+
+**The pipeline is not wired end to end.** `Dashboard.py` runs the strategy engine on a hardcoded sample DataFrame. Ingestion and sentiment both work, but their output has to be passed in manually. Connecting `run_ingestion_pipeline()` and `aggregate_sentiment()` to the dashboard is the single largest piece of remaining work.
+
+**The shipped broker config is illustrative.** The Trade Republic CSS selectors are guesses at that site's markup and will break as soon as the page changes; the PLV PDF URL is a placeholder. Both need replacing with real targets before any number here means anything.
+
+**Scores are relative, not absolute.** A CVS of 1.4 says a broker is expensive and poorly regarded *compared to the others in the input set* — not compared to the market. Adding or removing a competitor moves everyone's score. With fewer than three or four brokers the standard deviation is unstable and the Z-scores are close to meaningless.
+
+**Sentiment coverage is uneven.** Google News RSS needs no auth and works out of the box. Reddit needs API credentials. `fetch_x` returns fabricated posts to keep the interface consistent — X data requires paid API access and none of it reaches the score today. A broker with thin news coverage will get a sentiment reading built on very few signals, and nothing currently warns you when that happens.
+
+**Fee comparison is single-dimensional.** Only `standard_order_fee` feeds the score. Real broker cost structures include custody fees, FX spreads, and tiered pricing, so two brokers with the same headline order fee are not necessarily comparable on cost.
+
+**No tests, no caching.** Every run re-scrapes and re-classifies. FinBERT inference on a large headline set is slow, and repeated scraping is impolite to the sites involved.
+
+---
+
 ## Project structure
 
-```text
+```
 ├── Dashboard.py             # Streamlit UI: weight sliders, Plotly quadrant chart, tactics table
 ├── Unified_Ingestion.py     # HTML scraper + regulatory PDF fee parser
 ├── sentimental_analysis.py  # Reddit / Google News / X sentiment via FinBERT

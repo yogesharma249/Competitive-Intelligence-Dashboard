@@ -6,7 +6,6 @@ A prototype toolkit for benchmarking retail brokers against each other. It pulls
 
 The project targets the German retail brokerage market: the PDF parser looks for fee terms from a *Preis- und Leistungsverzeichnis* (PLV), and the Reddit scraper reads r/Finanzen and r/investing.
 
-![Streamlit dashboard showing the price/sentiment quadrant chart and tactics table](docs/dashboard.png)
 
 ---
 

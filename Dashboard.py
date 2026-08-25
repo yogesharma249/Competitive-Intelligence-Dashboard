@@ -13,7 +13,7 @@ from strategy_n_CVS import calculate_cvs_and_strategy
 
 st.set_page_config(page_title="CompIntel Dashboard", layout="wide")
 
-st.title("🛡️ Competitive Positioning Dashboard")
+st.title("🛡️ Competitive Intelligence Dashboard")
 
 # --- MOCK DATA ---
 if 'data' not in st.session_state:
@@ -37,7 +37,7 @@ with st.sidebar:
 df_strategy = calculate_cvs_and_strategy(st.session_state.data, w_price, w_sent)
 
 # --- UI LAYOUT ---
-col1, col2 = st.columns([2, 1])
+col1, col2 = st.columns([1, 2])
 
 with col1:
     st.subheader("Market Vulnerability Matrix")
